@@ -188,6 +188,22 @@ Precision colors designed for machines and humans, based on [Solarized](https://
 
 ---
 
+## Suisei Dark
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <h3>Suisei Dark</h3>
+      <img src="screenshots/suisei-dark.png" alt="Suisei Dark Theme" width="100%">
+      <br>
+      <i>Dark theme inspired by Hoshimachi Suisei — deep base with signature blue accent</i>
+    </td>
+    <td width="50%"></td>
+  </tr>
+</table>
+
+---
+
 ## Other Themes
 
 <table>

@@ -17,7 +17,7 @@ Comparison between default Proxmox Dark theme and UniFi theme:
 
 ## 🎨 Themes
 
-**21 themes** across 9 collections. Featured themes below — [**View Full Gallery →**](THEMES.md)
+**22 themes** across 10 collections. Featured themes below — [**View Full Gallery →**](THEMES.md)
 
 <table>
   <tr>
@@ -64,6 +64,7 @@ Comparison between default Proxmox Dark theme and UniFi theme:
 | UniFi | — |
 | GitHub Dark | — |
 | Blue Slate | — |
+| Suisei Dark | — |
 
 </details>
 
