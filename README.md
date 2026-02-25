@@ -1,4 +1,6 @@
-# ProxMorph
+# ProxMorph — Suisei Dark Edition
+
+> Fork of [IT-BAER/proxmorph](https://github.com/IT-BAER/proxmorph) with the **Suisei Dark** theme — a dark theme inspired by Hoshimachi Suisei.
 
 Custom themes for Proxmox VE (PVE) and Proxmox Backup Server (PBS) that integrate with the native Color Theme selector.
 
@@ -17,7 +19,7 @@ Comparison between default Proxmox Dark theme and UniFi theme:
 
 ## 🎨 Themes
 
-**21 themes** across 9 collections. Featured themes below — [**View Full Gallery →**](THEMES.md)
+**22 themes** across 10 collections. Featured themes below — [**View Full Gallery →**](THEMES.md)
 
 <table>
   <tr>
@@ -64,6 +66,7 @@ Comparison between default Proxmox Dark theme and UniFi theme:
 | UniFi | — |
 | GitHub Dark | — |
 | Blue Slate | — |
+| Suisei Dark | — |
 
 </details>
 
@@ -72,14 +75,14 @@ Comparison between default Proxmox Dark theme and UniFi theme:
 ### One-Liner Install
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/IT-BAER/proxmorph/main/install.sh) install
+bash <(curl -fsSL https://raw.githubusercontent.com/HRNPH/proxmorph-suisei-dark/main/install.sh) install
 ```
 
 ### Manual Install
 
 ```bash
-git clone https://github.com/IT-BAER/proxmorph.git
-cd proxmorph
+git clone https://github.com/HRNPH/proxmorph-suisei-dark.git
+cd proxmorph-suisei-dark
 chmod +x install.sh
 ./install.sh install
 ```
@@ -96,7 +99,7 @@ chmod +x install.sh
 |---------|-------------|
 | `./install.sh install` | Install themes |
 | `./install.sh uninstall` | Remove themes |
-| `./install.sh update` or `bash <(curl -fsSL https://raw.githubusercontent.com/IT-BAER/proxmorph/main/install.sh) update` | Updates (latest from GitHub) and install the latest themes |
+| `./install.sh update` or `bash <(curl -fsSL https://raw.githubusercontent.com/HRNPH/proxmorph-suisei-dark/main/install.sh) update` | Updates (latest from GitHub) and install the latest themes |
 | `./install.sh status` | Show installation status |
 
 ## 🛠️ Creating Themes
@@ -151,9 +154,9 @@ MIT License
 
 <br>
 
-## 💜 Support
+## 🙏 Credits
 
-If you like my themes, consider supporting this and future work, which heavily relies on coffee:
+This project is a fork of [ProxMorph by IT-BAER](https://github.com/IT-BAER/proxmorph). All original themes and the installation framework are their work — please consider supporting them:
 
 <div align="center">
 <a href="https://www.buymeacoffee.com/itbaer" target="_blank"><img src="https://github.com/user-attachments/assets/64107f03-ba5b-473e-b8ad-f3696fe06002" alt="Buy Me A Coffee" style="height: 60px; max-width: 217px;"></a>
