@@ -104,8 +104,25 @@ check_product() {
 
 # Get latest release version from GitHub
 get_latest_version() {
-    curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | \
-        grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/'
+    # Try releases API first
+    local version
+    version=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/releases/latest" | \
+        grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
+    if [[ -n "$version" ]]; then
+        echo "$version"
+        return 0
+    fi
+
+    # Fallback: try tags API
+    version=$(curl -s "https://api.github.com/repos/${GITHUB_REPO}/tags" | \
+        grep '"name"' | head -1 | sed -E 's/.*"v([^"]+)".*/\1/')
+    if [[ -n "$version" ]]; then
+        echo "$version"
+        return 0
+    fi
+
+    # Fallback: use hardcoded script version
+    echo "$VERSION"
 }
 
 # Download and extract release from GitHub
@@ -119,10 +136,32 @@ download_release() {
     
     print_info "Downloading ProxMorph v${version}..."
     
-    local download_url="https://github.com/${GITHUB_REPO}/releases/download/v${version}/proxmorph-${version}.tar.gz"
     local tmp_dir=$(mktemp -d)
+    local download_ok=false
     
-    if ! curl -sL "$download_url" -o "${tmp_dir}/proxmorph.tar.gz"; then
+    # Try release asset first
+    local download_url="https://github.com/${GITHUB_REPO}/releases/download/v${version}/proxmorph-${version}.tar.gz"
+    if curl -sfL "$download_url" -o "${tmp_dir}/proxmorph.tar.gz" 2>/dev/null; then
+        download_ok=true
+    fi
+    
+    # Fallback: try source archive from tag
+    if [[ "$download_ok" != true ]]; then
+        download_url="https://github.com/${GITHUB_REPO}/archive/refs/tags/v${version}.tar.gz"
+        if curl -sfL "$download_url" -o "${tmp_dir}/proxmorph.tar.gz" 2>/dev/null; then
+            download_ok=true
+        fi
+    fi
+    
+    # Fallback: try source archive from main branch
+    if [[ "$download_ok" != true ]]; then
+        download_url="https://github.com/${GITHUB_REPO}/archive/refs/heads/main.tar.gz"
+        if curl -sfL "$download_url" -o "${tmp_dir}/proxmorph.tar.gz" 2>/dev/null; then
+            download_ok=true
+        fi
+    fi
+    
+    if [[ "$download_ok" != true ]]; then
         print_error "Failed to download release v${version}"
         rm -rf "$tmp_dir"
         exit 1
@@ -131,7 +170,23 @@ download_release() {
     # Extract to install directory
     mkdir -p "$INSTALL_DIR"
     rm -rf "${INSTALL_DIR:?}"/*
-    tar -xzf "${tmp_dir}/proxmorph.tar.gz" -C "$INSTALL_DIR"
+    
+    # Extract archive; handle both flat and nested layouts
+    tar -xzf "${tmp_dir}/proxmorph.tar.gz" -C "$tmp_dir"
+    rm -f "${tmp_dir}/proxmorph.tar.gz"
+    
+    # GitHub source archives extract into a subdirectory (e.g. repo-tag/)
+    # Detect and use the nested directory as source, otherwise use tmp_dir directly
+    local source_dir="$tmp_dir"
+    local extracted_dir
+    extracted_dir=$(find "$tmp_dir" -mindepth 1 -maxdepth 1 -type d | head -1)
+    
+    if [[ -n "$extracted_dir" && -d "${extracted_dir}/themes" ]]; then
+        source_dir="$extracted_dir"
+    fi
+    
+    cp -a "${source_dir}"/* "$INSTALL_DIR"/
+    
     rm -rf "$tmp_dir"
     
     # Save version info
