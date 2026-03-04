@@ -546,10 +546,18 @@ install_theme_images() {
     # Download Suisei background if not already present
     if [[ ! -f "${THEMES_DIR}/images/suisei-bg.jpg" ]]; then
         print_info "Downloading Suisei background wallpaper..."
-        if curl -sfL "$SUISEI_BG_URL" -o "${THEMES_DIR}/images/suisei-bg.jpg" 2>/dev/null; then
-            cp "${THEMES_DIR}/images/suisei-bg.jpg" "${INSTALL_DIR}/themes/images/" 2>/dev/null || true
-            print_status "Downloaded Suisei background image"
+        if curl -sfL --max-time 30 --max-redirs 3 "$SUISEI_BG_URL" -o "${THEMES_DIR}/images/suisei-bg.jpg" 2>/dev/null; then
+            # Verify the download is a valid JPEG image
+            if file "${THEMES_DIR}/images/suisei-bg.jpg" 2>/dev/null | grep -qi "jpeg\|jpg"; then
+                cp "${THEMES_DIR}/images/suisei-bg.jpg" "${INSTALL_DIR}/themes/images/" 2>/dev/null || true
+                print_status "Downloaded Suisei background image"
+            else
+                rm -f "${THEMES_DIR}/images/suisei-bg.jpg"
+                print_warning "Downloaded file is not a valid JPEG image, removed."
+                print_warning "Suisei Dark With BG theme will work without the wallpaper."
+            fi
         else
+            rm -f "${THEMES_DIR}/images/suisei-bg.jpg"
             print_warning "Could not download Suisei background image."
             print_warning "Suisei Dark With BG theme will work without the wallpaper."
         fi

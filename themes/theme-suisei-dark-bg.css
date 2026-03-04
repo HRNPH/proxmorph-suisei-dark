@@ -112,6 +112,8 @@
 /* =====================================================
    BACKGROUND IMAGE OVERLAY (Suisei Dark With BG)
    Low-opacity wallpaper behind all UI elements.
+   Image path is relative to the themes directory
+   (${THEMES_DIR}/images/suisei-bg.jpg on Proxmox).
    ===================================================== */
 body::before {
     content: "";
