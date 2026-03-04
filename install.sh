@@ -18,10 +18,12 @@ NC='\033[0m' # No Color
 VERSION="2.4.0"
 WIDGET_TOOLKIT_DIR="/usr/share/javascript/proxmox-widget-toolkit"
 THEMES_DIR="${WIDGET_TOOLKIT_DIR}/themes"
+THEMES_IMAGES_DIR="${THEMES_DIR}/images"
 PROXMOXLIB_JS="${WIDGET_TOOLKIT_DIR}/proxmoxlib.js"
 BACKUP_DIR="/root/.proxmorph-backup"
 GITHUB_REPO="HRNPH/proxmorph-suisei-dark"
 INSTALL_DIR="/opt/proxmorph"
+SUISEI_BG_URL="https://images6.alphacoders.com/121/thumb-1920-1214626.jpg"
 
 # PVE-specific paths
 PVE_MANAGER_DIR="/usr/share/pve-manager"
@@ -527,6 +529,43 @@ get_themes_source() {
     return 1
 }
 
+# Install background images required by themes (e.g. Suisei Dark With BG)
+install_theme_images() {
+    local themes_source="$1"
+    mkdir -p "${THEMES_DIR}/images"
+    mkdir -p "${INSTALL_DIR}/themes/images"
+
+    # Copy images from repo/source if present
+    if [[ -d "${themes_source}/images" ]]; then
+        cp "${themes_source}/images"/* "${THEMES_DIR}/images/" 2>/dev/null || true
+        if [[ "$themes_source" != "${INSTALL_DIR}/themes" ]]; then
+            cp "${themes_source}/images"/* "${INSTALL_DIR}/themes/images/" 2>/dev/null || true
+        fi
+    fi
+
+    # Download Suisei background if not already present
+    if [[ ! -f "${THEMES_DIR}/images/suisei-bg.jpg" ]]; then
+        print_info "Downloading Suisei background wallpaper..."
+        if curl -sfL --max-time 30 --max-redirs 3 "$SUISEI_BG_URL" -o "${THEMES_DIR}/images/suisei-bg.jpg" 2>/dev/null; then
+            # Verify the download is a valid JPEG image
+            if file "${THEMES_DIR}/images/suisei-bg.jpg" 2>/dev/null | grep -qi "jpeg\|jpg"; then
+                cp "${THEMES_DIR}/images/suisei-bg.jpg" "${INSTALL_DIR}/themes/images/" 2>/dev/null || true
+                print_status "Downloaded Suisei background image"
+            else
+                rm -f "${THEMES_DIR}/images/suisei-bg.jpg"
+                print_warning "Downloaded file is not a valid JPEG image, removed."
+                print_warning "Suisei Dark With BG theme will work without the wallpaper."
+            fi
+        else
+            rm -f "${THEMES_DIR}/images/suisei-bg.jpg"
+            print_warning "Could not download Suisei background image."
+            print_warning "Suisei Dark With BG theme will work without the wallpaper."
+        fi
+    else
+        print_info "Suisei background image already present"
+    fi
+}
+
 # Install all themes from themes directory
 install_themes() {
     print_info "Installing ProxMorph themes..."
@@ -585,6 +624,9 @@ install_themes() {
         mkdir -p "${INSTALL_DIR}/themes/patches"
         cp "${themes_source}/patches"/*.js "${INSTALL_DIR}/themes/patches/" 2>/dev/null || true
     fi
+    
+    # Install background images for themes that need them
+    install_theme_images "$themes_source"
     
     # Install apt hook for persistence across updates
     install_apt_hook
@@ -655,6 +697,12 @@ uninstall_themes() {
             fi
         fi
     done
+    
+    # Remove theme images
+    if [[ -d "${THEMES_DIR}/images" ]]; then
+        rm -rf "${THEMES_DIR}/images"
+        print_status "Removed theme images"
+    fi
     
     # Remove JavaScript patches
     remove_js_patches
