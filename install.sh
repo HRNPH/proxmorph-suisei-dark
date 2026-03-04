@@ -176,18 +176,16 @@ download_release() {
     rm -f "${tmp_dir}/proxmorph.tar.gz"
     
     # GitHub source archives extract into a subdirectory (e.g. repo-tag/)
-    # Detect and flatten if needed
+    # Detect and use the nested directory as source, otherwise use tmp_dir directly
+    local source_dir="$tmp_dir"
     local extracted_dir
     extracted_dir=$(find "$tmp_dir" -mindepth 1 -maxdepth 1 -type d | head -1)
     
     if [[ -n "$extracted_dir" && -d "${extracted_dir}/themes" ]]; then
-        # Source archive layout: move contents from nested directory
-        cp -a "${extracted_dir}"/* "$INSTALL_DIR"/ 2>/dev/null || true
-        cp -a "${extracted_dir}"/.* "$INSTALL_DIR"/ 2>/dev/null || true
-    else
-        # Flat archive layout (release asset): contents already at top level in tmp_dir
-        cp -a "$tmp_dir"/* "$INSTALL_DIR"/ 2>/dev/null || true
+        source_dir="$extracted_dir"
     fi
+    
+    cp -a "${source_dir}"/* "$INSTALL_DIR"/
     
     rm -rf "$tmp_dir"
     
